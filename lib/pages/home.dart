@@ -12,13 +12,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List _checkList = ['Iraponan', 'Marinho'];
+  List _checkList = [];
+
+  final TextEditingController _todoControler = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Tarefas'),
+        title: const Text(
+          'Lista de Tarefas',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
       ),
@@ -28,9 +33,10 @@ class _HomeState extends State<Home> {
             padding: const EdgeInsets.fromLTRB(17, 1, 7, 1),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    controller: _todoControler,
+                    decoration: const InputDecoration(
                       labelText: 'Nova Tarefa',
                       labelStyle: TextStyle(
                         color: Colors.blueAccent,
@@ -42,7 +48,7 @@ class _HomeState extends State<Home> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                   ),
-                  onPressed: () {},
+                  onPressed: addTodo,
                   child: const Text(
                     'Add',
                     style: TextStyle(color: Colors.white),
@@ -63,7 +69,11 @@ class _HomeState extends State<Home> {
                     child: Icon(
                         _checkList[index]['ok'] ? Icons.check : Icons.error),
                   ),
-                  onChanged: null,
+                  onChanged: (check) {
+                    setState(() {
+                      _checkList[index]['ok'] = check;
+                    });
+                  },
                 );
               },
             ),
@@ -71,6 +81,16 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
+  }
+
+  void addTodo() {
+    setState(() {
+      Map<String, dynamic> newTodo = Map();
+      newTodo['title'] = _todoControler.text;
+      _todoControler.text = '';
+      newTodo['ok'] = false;
+      _checkList.add(newTodo);
+    });
   }
 
   Future<File> _getFile() async {
