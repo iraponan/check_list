@@ -12,9 +12,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final TextEditingController _todoControler = TextEditingController();
+
   List _checkList = [];
 
-  final TextEditingController _todoControler = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _readData().then((data) {
+      setState(() {
+        _checkList = json.decode(data!);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +46,7 @@ class _HomeState extends State<Home> {
               children: [
                 Expanded(
                   child: TextField(
+                    textCapitalization: TextCapitalization.sentences,
                     controller: _todoControler,
                     decoration: const InputDecoration(
                       labelText: 'Nova Tarefa',
@@ -72,6 +84,7 @@ class _HomeState extends State<Home> {
                   onChanged: (check) {
                     setState(() {
                       _checkList[index]['ok'] = check;
+                      _saveData();
                     });
                   },
                 );
@@ -90,6 +103,7 @@ class _HomeState extends State<Home> {
       _todoControler.text = '';
       newTodo['ok'] = false;
       _checkList.add(newTodo);
+      _saveData();
     });
   }
 
