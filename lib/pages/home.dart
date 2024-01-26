@@ -16,7 +16,6 @@ class _HomeState extends State<Home> {
 
   List _checkList = [];
 
-
   @override
   void initState() {
     super.initState();
@@ -73,25 +72,41 @@ class _HomeState extends State<Home> {
             child: ListView.builder(
               padding: const EdgeInsets.only(top: 10),
               itemCount: _checkList.length,
-              itemBuilder: (context, index) {
-                return CheckboxListTile(
-                  title: Text(_checkList[index]['title']),
-                  value: _checkList[index]['ok'],
-                  secondary: CircleAvatar(
-                    child: Icon(
-                        _checkList[index]['ok'] ? Icons.check : Icons.error),
-                  ),
-                  onChanged: (check) {
-                    setState(() {
-                      _checkList[index]['ok'] = check;
-                      _saveData();
-                    });
-                  },
-                );
-              },
+              itemBuilder: buidItem,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buidItem(context, index) {
+    return Dismissible(
+      background: Container(
+        color: Colors.red,
+        child: const Align(
+          alignment: Alignment(-0.9, 0),
+          child: Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      direction: DismissDirection.startToEnd,
+      key: Key(DateTime.now().microsecondsSinceEpoch.toString()),
+      child: CheckboxListTile(
+        title: Text(_checkList[index]['title']),
+        value: _checkList[index]['ok'],
+        secondary: CircleAvatar(
+          child: Icon(
+              _checkList[index]['ok'] ? Icons.check : Icons.error),
+        ),
+        onChanged: (check) {
+          setState(() {
+            _checkList[index]['ok'] = check;
+            _saveData();
+          });
+        },
       ),
     );
   }
