@@ -71,10 +71,13 @@ class _HomeState extends State<Home> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 10),
-              itemCount: _checkList.length,
-              itemBuilder: buidItem,
+            child: RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView.builder(
+                padding: const EdgeInsets.only(top: 10),
+                itemCount: _checkList.length,
+                itemBuilder: buidItem,
+              ),
             ),
           ),
         ],
@@ -82,19 +85,37 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Future<Null> _refresh() async {
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      _checkList.sort((a, b) {
+        if (a['ok'] && !b['ok']) {
+          return 1;
+        } else if (!a['ok'] && b['ok']) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+      _saveData();
+    });
+    return null;
+  }
+
   Widget buidItem(context, index) {
     return Dismissible(
       background: Container(
         color: Colors.red,
         child: const Align(
-          alignment: Alignment(0, 0.9),
+          alignment: Alignment(-0.9, 0),
           child: Icon(
             Icons.delete,
             color: Colors.white,
           ),
         ),
       ),
-      direction: DismissDirection.endToStart,
+      direction: DismissDirection.startToEnd,
       key: Key(DateTime.now().microsecondsSinceEpoch.toString()),
       child: CheckboxListTile(
         title: Text(_checkList[index]['title']),
@@ -113,10 +134,10 @@ class _HomeState extends State<Home> {
         setState(() {
           _lastRemoved = Map.from(_checkList[index]);
           _lastRemovedPos = index;
-          _checkList.remove(index);
+          _checkList.removeAt(index);
           _saveData();
           final snack = SnackBar(
-            content: Text('Tarefa ${_lastRemoved['tile']} removida.'),
+            content: Text('Tarefa ${_lastRemoved['title']} removida.'),
             action: SnackBarAction(
               label: 'Desfazer',
               onPressed: () {
@@ -126,8 +147,9 @@ class _HomeState extends State<Home> {
                 });
               },
             ),
-            duration: const Duration(seconds: 5),
+            duration: const Duration(seconds: 2),
           );
+          ScaffoldMessengerState().removeCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(snack);
         });
       },
