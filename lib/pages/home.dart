@@ -15,6 +15,8 @@ class _HomeState extends State<Home> {
   final TextEditingController _todoControler = TextEditingController();
 
   List _checkList = [];
+  late Map<String, dynamic> _lastRemoved;
+  late int _lastRemovedPos;
 
   @override
   void initState() {
@@ -85,21 +87,20 @@ class _HomeState extends State<Home> {
       background: Container(
         color: Colors.red,
         child: const Align(
-          alignment: Alignment(-0.9, 0),
+          alignment: Alignment(0, 0.9),
           child: Icon(
             Icons.delete,
             color: Colors.white,
           ),
         ),
       ),
-      direction: DismissDirection.startToEnd,
+      direction: DismissDirection.endToStart,
       key: Key(DateTime.now().microsecondsSinceEpoch.toString()),
       child: CheckboxListTile(
         title: Text(_checkList[index]['title']),
         value: _checkList[index]['ok'],
         secondary: CircleAvatar(
-          child: Icon(
-              _checkList[index]['ok'] ? Icons.check : Icons.error),
+          child: Icon(_checkList[index]['ok'] ? Icons.check : Icons.error),
         ),
         onChanged: (check) {
           setState(() {
@@ -108,6 +109,28 @@ class _HomeState extends State<Home> {
           });
         },
       ),
+      onDismissed: (direction) {
+        setState(() {
+          _lastRemoved = Map.from(_checkList[index]);
+          _lastRemovedPos = index;
+          _checkList.remove(index);
+          _saveData();
+          final snack = SnackBar(
+            content: Text('Tarefa ${_lastRemoved['tile']} removida.'),
+            action: SnackBarAction(
+              label: 'Desfazer',
+              onPressed: () {
+                setState(() {
+                  _checkList.insert(_lastRemovedPos, _lastRemoved);
+                  _saveData();
+                });
+              },
+            ),
+            duration: const Duration(seconds: 5),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snack);
+        });
+      },
     );
   }
 
