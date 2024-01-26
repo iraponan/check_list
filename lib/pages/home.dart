@@ -12,7 +12,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List _checkList = [];
+  List _checkList = ['Iraponan', 'Marinho'];
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +49,23 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.only(top: 10),
+              itemCount: _checkList.length,
+              itemBuilder: (context, index) {
+                return CheckboxListTile(
+                  title: Text(_checkList[index]['title']),
+                  value: _checkList[index]['ok'],
+                  secondary: CircleAvatar(
+                    child: Icon(
+                        _checkList[index]['ok'] ? Icons.check : Icons.error),
+                  ),
+                  onChanged: null,
+                );
+              },
             ),
           ),
         ],
